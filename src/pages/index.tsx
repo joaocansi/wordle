@@ -1,8 +1,10 @@
+import Container from "components/Container";
+
 function Home() {
   return (
-    <div className="container">
-      <main></main>
-    </div>
+    <Container title="Wordle">
+      <h1>fefe</h1>
+    </Container>
   );
 }
 
