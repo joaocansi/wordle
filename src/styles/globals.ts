@@ -23,7 +23,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-family: Helvetica, Arial, sans-serif;
     background-color: var(--background);
-  }
+  } 
 `;
 
 export default GlobalStyle;

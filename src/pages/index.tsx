@@ -1,9 +1,10 @@
 import Container from "components/Container";
+import Keyboard from "components/keyboard/Keyboard";
 
 function Home() {
   return (
     <Container title="Wordle">
-      <h1>fefe</h1>
+      <Keyboard />
     </Container>
   );
 }
