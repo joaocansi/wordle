@@ -1,12 +1,15 @@
 import styled from "styled-components";
 
 const Container = styled.div`
-  width: 95%;
+  width: 100%;
+  max-width: 940px;
   margin: 0 auto;
-  max-width: 500px;
+  height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
 `;
 
 export { Container };

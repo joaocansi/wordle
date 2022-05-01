@@ -1,6 +1,8 @@
 import { ReactNode, useEffect } from "react";
 import Header from "./Header";
 
+import * as S from "styles/components/ContainerStyle";
+
 interface ContainerProps {
   children: ReactNode;
   title: string;
@@ -19,7 +21,7 @@ const Container = ({ children, title }: ContainerProps) => {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <S.Container>{children}</S.Container>
     </>
   );
 };

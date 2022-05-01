@@ -1,7 +1,7 @@
-const keyboardSettings = [
+const KEYBOARD = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-  ["", "A", "S", "D", "F", "G", "H", "J", "K", "L", ""],
-  ["ENTER", "Z", "X", "C", "V", "B", "N", "N", "DELETE"],
+  ["_", "A", "S", "D", "F", "G", "H", "J", "K", "L", "_"],
+  ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "DELETE"],
 ];
 
-export { keyboardSettings };
+export { KEYBOARD };
