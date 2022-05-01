@@ -4,10 +4,10 @@ const Header = () => {
   return (
     <S.Container>
       <h1>Wordle</h1>
-      <div>
+      {/* <div>
         <i className="fa-regular fa-circle-question"></i>
         <i className="fa-solid fa-gear"></i>
-      </div>
+      </div> */}
     </S.Container>
   );
 };

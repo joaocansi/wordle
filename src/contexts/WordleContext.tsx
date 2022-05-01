@@ -1,6 +1,8 @@
 import {
   createContext,
+  Dispatch,
   ReactNode,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -16,7 +18,12 @@ interface WordleContextProps {
   isRunning: boolean;
   boardRow: number;
   boardColumn: number;
+  status: string;
 
+  modal: boolean;
+  setModal: Dispatch<SetStateAction<boolean>>;
+
+  start: () => void;
   onLetterClick: (letter: string) => void;
   onEnterClick: () => void;
   onDeleteClick: () => void;
@@ -30,6 +37,7 @@ interface WordleProviderProps {
 
 const WordleProvider = ({ children }: WordleProviderProps) => {
   const [solution, setSolution] = useState("");
+  const [status, setStatus] = useState("IN_PROGRESS");
   const [isRunning, setIsRunning] = useState(false);
   const [boardRow, setBoardRow] = useState(0);
   const [boardColumn, setBoardColumn] = useState(0);
@@ -42,9 +50,28 @@ const WordleProvider = ({ children }: WordleProviderProps) => {
     ["", "", "", "", ""],
   ]);
   const [boardStatus, setBoardStatus] = useState(Array(6).fill(null));
+  const [modal, setModal] = useState(false);
 
   useEffect(() => {
-    // generating the word
+    const word = words[Math.floor(Math.random() * words.length)];
+    setSolution(word);
+  }, []);
+
+  const start = useCallback(() => {
+    setIsRunning(false);
+    setStatus("IN_PROGRESS");
+    setBoardRow(0);
+    setBoardColumn(0);
+    setBoardGuesses([
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+    ]);
+    setBoardStatus(Array(6).fill(null));
+
     const word = words[Math.floor(Math.random() * words.length)];
     setSolution(word);
   }, []);
@@ -52,7 +79,7 @@ const WordleProvider = ({ children }: WordleProviderProps) => {
   const onLetterClick = useCallback(
     (letter: string) => {
       // if word revealing animation is true or board row is already filled return void
-      if (isRunning || boardColumn === 5) {
+      if (isRunning || boardColumn === 5 || status !== "IN_PROGRESS") {
         return;
       }
 
@@ -64,7 +91,7 @@ const WordleProvider = ({ children }: WordleProviderProps) => {
       // when word is already filled keep his value until the user presses the enter button
       setBoardColumn(boardColumn === 5 ? boardColumn : boardColumn + 1);
     },
-    [boardColumn, boardGuesses, boardRow, isRunning]
+    [boardColumn, boardGuesses, boardRow, isRunning, status]
   );
 
   const onEnterClick = () => {
@@ -139,11 +166,19 @@ const WordleProvider = ({ children }: WordleProviderProps) => {
       if (word === solution) {
         return onWin();
       }
+
+      setBoardRow((previousBoardRow) => {
+        if (previousBoardRow === 6) {
+          onGameOver();
+        }
+
+        return previousBoardRow;
+      });
     }, 5 * 350);
   };
 
   const onDeleteClick = () => {
-    if (isRunning) {
+    if (isRunning || status !== "IN_PROGRESS") {
       return;
     }
 
@@ -153,15 +188,25 @@ const WordleProvider = ({ children }: WordleProviderProps) => {
     setBoardColumn(boardColumn === 0 ? 0 : boardColumn - 1);
   };
 
-  const onGameOver = () => {};
-  const onWin = () => {};
+  const onGameOver = () => {
+    setStatus("GAME_OVER");
+    setModal(true);
+  };
+  const onWin = () => {
+    setStatus("WON");
+    setModal(true);
+  };
 
   return (
     <WordleContext.Provider
       value={{
+        start,
         onLetterClick,
         onDeleteClick,
         onEnterClick,
+        setModal,
+        modal,
+        status,
         boardColumn,
         boardRow,
         solution,

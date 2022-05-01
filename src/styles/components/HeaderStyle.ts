@@ -7,7 +7,7 @@ const Container = styled.header`
   padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   height: 60px;
   border-bottom: 1px solid var(--gray-900);
 

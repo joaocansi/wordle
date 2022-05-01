@@ -20,11 +20,14 @@ const GlobalStyle = createGlobalStyle`
     --background: #121213;
     --white: #ffffff;
 
+    --gray-100: #c1c1c1;
     --gray-900: #3a3a3c;
     --gray-500: #818384;
+    --gray-800: #1a1a1b;
 
     --yellow-400: #b59f3b;
     --green-500: #538d4e;
+    --red-200: #db3d2c;
   }
 
   body {
@@ -65,6 +68,25 @@ const GlobalStyle = createGlobalStyle`
     }
     50.1%{
       background-color: var(--gray-900);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes red-letter-animation {
+    0% {
+      border-color: var(--gray-900);
+      background-color: transparent;
+      transform: scaleY(1);
+    }
+    50% {
+      border-color: var(--gray-900);
+      background-color: transparent;
+      transform: scaleY(0);
+    }
+    50.1%{
+      background-color: var(--red-200);
     }
     100% {
       transform: scaleY(1);
