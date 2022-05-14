@@ -1,18 +1,16 @@
-import { useWordle } from "contexts/WordleContext";
-import * as S from "styles/components/board/BoardStyle";
-import BoardRow from "./BoardRow";
+import { useWordle } from 'contexts/WordleContext';
+import styles from 'styles/components/board/Board.module.scss';
+import BoardRow from './BoardRow';
 
 const Board = () => {
-  const { boardGuesses } = useWordle();
+  const { board } = useWordle();
 
   return (
-    <S.Container>
-      {boardGuesses.map((letters, row) => {
-        return (
-          <BoardRow key={`board-row-${row}`} row={row} letters={letters} />
-        );
+    <div className={styles.boardContainer}>
+      {board.map((letters, row) => {
+        return <BoardRow key={`board-${row}`} letters={letters} row={row} />;
       })}
-    </S.Container>
+    </div>
   );
 };
 

@@ -1,14 +1,14 @@
-import * as S from "styles/components/HeaderStyle";
+import styles from 'styles/components/Header.module.scss';
 
 const Header = () => {
   return (
-    <S.Container>
+    <header id={styles.header}>
       <h1>Wordle</h1>
-      {/* <div>
+      <div>
         <i className="fa-regular fa-circle-question"></i>
         <i className="fa-solid fa-gear"></i>
-      </div> */}
-    </S.Container>
+      </div>
+    </header>
   );
 };
 

@@ -1,7 +1,7 @@
-import { ReactNode, useEffect } from "react";
-import Header from "./Header";
+import { ReactNode, useEffect } from 'react';
+import Header from './Header';
 
-import * as S from "styles/components/ContainerStyle";
+import styles from 'styles/components/Container.module.scss';
 
 interface ContainerProps {
   children: ReactNode;
@@ -19,10 +19,10 @@ const Container = ({ children, title }: ContainerProps) => {
   }, [title]);
 
   return (
-    <>
+    <div className={styles.container}>
       <Header />
-      <S.Container>{children}</S.Container>
-    </>
+      <main>{children}</main>
+    </div>
   );
 };
 

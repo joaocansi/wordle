@@ -1,0 +1,9 @@
+.boardRowContainer {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+
+  &.boardRowSelected div {
+    background-color: transparent;
+  }
+}

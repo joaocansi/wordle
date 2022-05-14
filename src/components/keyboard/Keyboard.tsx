@@ -1,15 +1,14 @@
-import * as S from "styles/components/keyboard/KeyboardStyle";
-import KeyboardRow from "./KeyboardRow";
-
-import { KEYBOARD } from "utils/constants";
+import styles from 'styles/components/keyboard/Keyboard.module.scss';
+import { KEYBOARD } from 'utils/settings';
+import KeyboardRow from './KeyboardRow';
 
 const Keyboard = () => {
   return (
-    <S.Container>
+    <div className={styles.keyboardContainer}>
       {KEYBOARD.map((keys, row) => {
-        return <KeyboardRow key={`key-${row}`} keys={keys} row={row} />;
+        return <KeyboardRow key={`keyboard-${row}`} row={row} keys={keys} />;
       })}
-    </S.Container>
+    </div>
   );
 };
 

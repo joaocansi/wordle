@@ -1,0 +1,9 @@
+.boardContainer {
+  width: 100%;
+  margin: 0 auto;
+  max-width: var(--board-width);
+  min-height: var(--board-height);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

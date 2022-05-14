@@ -1,218 +1,220 @@
+import { useSyncState } from 'hooks/useSyncState';
 import {
   createContext,
-  Dispatch,
   ReactNode,
-  SetStateAction,
   useCallback,
   useContext,
-  useEffect,
   useState,
-} from "react";
-import { getIndexes } from "utils/functions";
-import { validGuesses, words } from "utils/words";
+} from 'react';
+import { getBoardStatus, getIndexes } from 'utils/functions';
+import { GAME_COLUMNS, GAME_ROWS, NEW_BOARD } from 'utils/settings';
+import { validGuesses, words } from 'utils/words';
 
 interface WordleContextProps {
-  boardGuesses: string[][];
-  boardStatus: string[][];
+  isAnimating: () => boolean;
   solution: string;
-  isRunning: boolean;
-  boardRow: number;
-  boardColumn: number;
   status: string;
+  boardStatus: string[][];
+  board: string[][];
+  position: {
+    row: number;
+    column: number;
+  };
 
-  modal: boolean;
-  setModal: Dispatch<SetStateAction<boolean>>;
-
-  start: () => void;
-  onLetterClick: (letter: string) => void;
-  onEnterClick: () => void;
   onDeleteClick: () => void;
+  onEnterClick: () => void;
+  onLetterClick: (letter: string) => void;
+  onBoardLetterClick: (row: number, column: number) => void;
+  onKeyboardArrowClick: (direction: string) => void;
 }
-
-const WordleContext = createContext({} as WordleContextProps);
-
 interface WordleProviderProps {
   children: ReactNode;
 }
 
-const WordleProvider = ({ children }: WordleProviderProps) => {
-  const [solution, setSolution] = useState("");
-  const [status, setStatus] = useState("IN_PROGRESS");
-  const [isRunning, setIsRunning] = useState(false);
-  const [boardRow, setBoardRow] = useState(0);
-  const [boardColumn, setBoardColumn] = useState(0);
-  const [boardGuesses, setBoardGuesses] = useState([
-    ["", "", "", "", ""],
-    ["", "", "", "", ""],
-    ["", "", "", "", ""],
-    ["", "", "", "", ""],
-    ["", "", "", "", ""],
-    ["", "", "", "", ""],
-  ]);
-  const [boardStatus, setBoardStatus] = useState(Array(6).fill(null));
-  const [modal, setModal] = useState(false);
+const WordleContext = createContext({} as WordleContextProps);
 
-  useEffect(() => {
-    const word = words[Math.floor(Math.random() * words.length)];
-    setSolution(word);
-  }, []);
+export const WordleProvider = ({ children }: WordleProviderProps) => {
+  const [isAnimating, setIsAnimating] = useSyncState(false);
+  const [status, setStatus] = useState('IN_PROGRESS');
 
-  const start = useCallback(() => {
-    setIsRunning(false);
-    setStatus("IN_PROGRESS");
-    setBoardRow(0);
-    setBoardColumn(0);
-    setBoardGuesses([
-      ["", "", "", "", ""],
-      ["", "", "", "", ""],
-      ["", "", "", "", ""],
-      ["", "", "", "", ""],
-      ["", "", "", "", ""],
-      ["", "", "", "", ""],
-    ]);
-    setBoardStatus(Array(6).fill(null));
+  const [board, setBoard] = useState(NEW_BOARD);
+  const [boardStatus, setBoardStatus] = useState(Array(GAME_ROWS).fill(null));
 
-    const word = words[Math.floor(Math.random() * words.length)];
-    setSolution(word);
-  }, []);
+  const [position, setPosition] = useState({ row: 0, column: 0 });
+  const [solution, setSolution] = useState('AAEEA');
 
-  const onLetterClick = useCallback(
-    (letter: string) => {
-      // if word revealing animation is true or board row is already filled return void
-      if (isRunning || boardColumn === 5 || status !== "IN_PROGRESS") {
-        return;
-      }
+  // const onLetterClick = useCallback(
+  //   (letter: string) => {
+  //     const isBlocked = isAnimating || position.column >= GAME_COLUMNS;
+  //     if (isBlocked) return;
 
-      // defining the letter in his respective row and column
-      let newBoardGuesses = boardGuesses;
-      newBoardGuesses[boardRow][boardColumn] = letter;
-      setBoardGuesses(newBoardGuesses);
+  //     let newBoard = board;
+  //     newBoard[position.row][position.column] = letter;
 
-      // when word is already filled keep his value until the user presses the enter button
-      setBoardColumn(boardColumn === 5 ? boardColumn : boardColumn + 1);
-    },
-    [boardColumn, boardGuesses, boardRow, isRunning, status]
-  );
+  //     setBoard(newBoard);
+  //     setPosition((previousPosition) => {
+  //       let newPosition = {
+  //         row: previousPosition.row,
+  //         column:
+  //           previousPosition.column >= GAME_COLUMNS
+  //             ? GAME_COLUMNS
+  //             : previousPosition.column + 1,
+  //       };
+
+  //       return newPosition;
+  //     });
+  //   },
+  //   [board, position]
+  // );
+
+  const onLetterClick = (letter: string) => {
+    const isBlocked =
+      isAnimating() ||
+      status !== 'IN_PROGRESS' ||
+      position.column >= GAME_COLUMNS;
+    if (isBlocked) return;
+
+    let newBoard = board;
+    newBoard[position.row][position.column] = letter.toUpperCase();
+
+    setBoard(newBoard);
+    setPosition(({ row }) => {
+      let nextColumn = board[row].findIndex((item) => item === '');
+
+      let newPosition = {
+        row,
+        column: nextColumn == -1 ? GAME_COLUMNS : nextColumn,
+      };
+
+      return newPosition;
+    });
+  };
 
   const onEnterClick = () => {
-    // avoid user from pressing ENTER until the word revealing animation is over
-    // or until board row is not totally filled
-    if (isRunning || boardColumn !== 5) {
+    if (isAnimating() || status !== 'IN_PROGRESS' || position.row === GAME_ROWS)
       return;
+
+    if (board[position.row].includes('')) {
+      return alert('Not enough letters');
     }
 
-    // when user already used all of his chances and didnt matched the word, the game is over
-    if (boardRow === 6) {
-      return onGameOver();
+    let word = board[position.row].toString().replaceAll(',', '');
+    if (!validGuesses.includes(word.toLowerCase())) {
+      return alert('Not in word list');
     }
-
-    const word = boardGuesses[boardRow].toString().replaceAll(",", "");
-    const guessedWords = boardGuesses.map((letters) => {
-      return letters.toString().replaceAll(",", "");
-    });
-
-    // alert if there's duplicated words
-    if (guessedWords.filter((item) => item === word).length > 1) {
-      alert("Word already guessed");
-
-      return;
-    }
-
-    if (!validGuesses.includes(word)) {
-      alert("Not in word list");
-
-      return;
-    }
-
-    let newBoardStatus = boardStatus;
-    let newBoardRow = Array(5).fill("");
 
     const solutionArray = Array.from(solution);
-    for (var i = 0; i < 5; i++) {
-      const wordLetter = word[i];
 
-      // get all occourances of the word letter
-      const getLetterIndexes = getIndexes(wordLetter, solutionArray);
+    let newBoardStatus = boardStatus;
 
-      // when this letter is not in solution, set board status to ABSENT
-      if (getLetterIndexes.length === 0) {
-        newBoardRow[i] = "ABSENT";
-        continue;
-      }
-
-      // when this letter is included, set board status to CORRECT
-      if (getLetterIndexes.includes(i)) {
-        newBoardRow[i] = "CORRECT";
-        continue;
-      }
-
-      // when this letter exists but is not in the correct place, set board status to PRESENT
-      newBoardRow[i] = "PRESENT";
-      continue;
-    }
-
-    newBoardStatus[boardRow] = newBoardRow;
+    newBoardStatus[position.row] = getBoardStatus(
+      board[position.row],
+      solution
+    );
 
     setBoardStatus(newBoardStatus);
-    setIsRunning(true);
+    setIsAnimating(true);
 
-    // after executing the animation, set new values to the state
-    setTimeout(() => {
-      setIsRunning(false);
+    let timeout: any;
+    clearTimeout(timeout);
 
-      setBoardRow(boardRow + 1);
-      setBoardColumn(0);
+    timeout = setTimeout(() => {
+      const newPosition = {
+        row: position.row + 1,
+        column: 0,
+      };
 
-      if (word === solution) {
-        return onWin();
-      }
+      setIsAnimating(false);
+      setPosition(newPosition);
 
-      setBoardRow((previousBoardRow) => {
-        if (previousBoardRow === 6) {
-          onGameOver();
-        }
+      if (word === solution) return setStatus('WON');
 
-        return previousBoardRow;
-      });
-    }, 5 * 350);
+      if (newPosition.row === GAME_ROWS) return setStatus('GAME_OVER');
+    }, GAME_COLUMNS * 350);
   };
 
   const onDeleteClick = () => {
-    if (isRunning || status !== "IN_PROGRESS") {
+    if (isAnimating() || status != 'IN_PROGRESS') return;
+
+    let newBoard = board;
+    let actualColumn =
+      position.column >= GAME_COLUMNS ? GAME_COLUMNS - 1 : position.column;
+
+    if (board[position.row][actualColumn] !== '') {
+      newBoard[position.row][actualColumn] = '';
+
+      setBoard(newBoard);
+      setPosition(({ row }) => {
+        return {
+          row,
+          column: actualColumn - 1 < 0 ? 0 : actualColumn,
+        };
+      });
+
       return;
     }
 
-    let newBoardGuesses = boardGuesses;
-    newBoardGuesses[boardRow][boardColumn - 1] = "";
+    if (actualColumn == 0) return;
+    newBoard[position.row][actualColumn - 1] = '';
 
-    setBoardColumn(boardColumn === 0 ? 0 : boardColumn - 1);
+    setBoard(newBoard);
+    setPosition(({ row }) => {
+      return {
+        row,
+        column: actualColumn - 1 < 0 ? 0 : actualColumn - 1,
+      };
+    });
   };
 
-  const onGameOver = () => {
-    setStatus("GAME_OVER");
-    setModal(true);
+  const onBoardLetterClick = (row: number, column: number) => {
+    if (isAnimating() || status !== 'IN_PROGRESS' || position.row !== row)
+      return;
+
+    setPosition(({ row }) => {
+      return { row, column };
+    });
   };
-  const onWin = () => {
-    setStatus("WON");
-    setModal(true);
+
+  const onKeyboardArrowClick = (direction: string) => {
+    if (isAnimating() || status !== 'IN_PROGRESS') return;
+
+    switch (direction) {
+      case 'left':
+        setPosition(({ row, column }) => {
+          return {
+            row,
+            column: column - 1 < 0 ? 0 : column - 1,
+          };
+        });
+
+        break;
+      case 'right':
+        setPosition(({ row, column }) => {
+          return {
+            row,
+            column: column + 1 > GAME_COLUMNS - 1 ? column : column + 1,
+          };
+        });
+
+        break;
+      default:
+    }
   };
 
   return (
     <WordleContext.Provider
       value={{
-        start,
-        onLetterClick,
+        isAnimating,
+        solution,
+        status,
+        board,
+        boardStatus,
+        position,
         onDeleteClick,
         onEnterClick,
-        setModal,
-        modal,
-        status,
-        boardColumn,
-        boardRow,
-        solution,
-        boardGuesses,
-        boardStatus,
-        isRunning,
+        onLetterClick,
+        onBoardLetterClick,
+        onKeyboardArrowClick,
       }}
     >
       {children}
@@ -220,5 +222,4 @@ const WordleProvider = ({ children }: WordleProviderProps) => {
   );
 };
 
-export default WordleProvider;
 export const useWordle = () => useContext(WordleContext);

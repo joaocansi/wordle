@@ -1,0 +1,21 @@
+.keyboardKeyContainer {
+  flex: 1;
+  border: 3px solid var(--color-keyboard-border);
+  background-color: var(--color-keyboard-background);
+  height: 65px;
+  border-radius: 5px;
+  color: var(--color-texts);
+  font-size: 1.75em;
+  font-weight: 700;
+  cursor: pointer;
+
+  &.keyboardKeyFake {
+    background: transparent;
+    border-color: transparent;
+    flex: .5;
+  }
+
+  &.keyboardSpecialKey {
+    flex: 1.5;
+  }
+}

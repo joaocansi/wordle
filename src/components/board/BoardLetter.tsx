@@ -1,5 +1,6 @@
-import { useWordle } from "contexts/WordleContext";
-import * as S from "styles/components/board/BoardLetterStyle";
+import classNames from 'classnames';
+import { useWordle } from 'contexts/WordleContext';
+import styles from 'styles/components/board/BoardLetter.module.scss';
 
 interface BoardLetterProps {
   letter: string;
@@ -13,16 +14,35 @@ const BoardLetter = ({
   letter,
   positions: { row, column },
 }: BoardLetterProps) => {
-  const { boardStatus, isRunning } = useWordle();
+  const { position, boardStatus, status, isAnimating, onBoardLetterClick } =
+    useWordle();
+
+  const classes = classNames([
+    styles.boardLetterContainer,
+    {
+      [styles.boardLetterSelected]:
+        status === 'IN_PROGRESS' &&
+        !isAnimating() &&
+        row === position.row &&
+        column === position.column,
+      [styles.boardLetterAnimate]: isAnimating() && position.row === row,
+      [styles.boardLetterCorrect]:
+        boardStatus[row] && boardStatus[row][column] === 'CORRECT',
+      [styles.boardLetterPresent]:
+        boardStatus[row] && boardStatus[row][column] === 'PRESENT',
+      [styles.boardLetterAbsent]:
+        boardStatus[row] && boardStatus[row][column] === 'ABSENT',
+    },
+  ]);
 
   return (
-    <S.Container
-      style={{ animationDelay: `${column * 0.35}s` }}
-      isAnimating={isRunning}
-      status={boardStatus[row] != null ? boardStatus[row][column] : ""}
+    <div
+      onClick={() => onBoardLetterClick(row, column)}
+      className={classes}
+      style={{ animationDelay: `${0.35 * column}s` }}
     >
-      <S.Letter>{letter}</S.Letter>
-    </S.Container>
+      {letter}
+    </div>
   );
 };
 

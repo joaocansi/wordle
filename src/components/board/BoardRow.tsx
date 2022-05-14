@@ -1,28 +1,36 @@
-import BoardLetter from "./BoardLetter";
-
-import * as S from "styles/components/board/BoardRowStyle";
+import classNames from 'classnames';
+import { useWordle } from 'contexts/WordleContext';
+import styles from 'styles/components/board/BoardRow.module.scss';
+import BoardLetter from './BoardLetter';
 
 interface BoardRowProps {
-  row: number;
   letters: string[];
+  row: number;
 }
 
-const BoardRow = ({ row, letters }: BoardRowProps) => {
+const BoardRow = ({ letters, row }: BoardRowProps) => {
+  const { position, isAnimating, status } = useWordle();
+
+  const classes = classNames([
+    styles.boardRowContainer,
+    {
+      [styles.boardRowSelected]:
+        status === 'IN_PROGRESS' && position.row === row && !isAnimating(),
+    },
+  ]);
+
   return (
-    <S.Container>
+    <div className={classes}>
       {letters.map((letter, column) => {
         return (
           <BoardLetter
-            key={`board-letter-${row}-${column}`}
+            key={`board-letter-${letter}-${column}`}
             letter={letter}
-            positions={{
-              row,
-              column,
-            }}
+            positions={{ row, column }}
           />
         );
       })}
-    </S.Container>
+    </div>
   );
 };
 

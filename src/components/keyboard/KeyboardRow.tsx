@@ -1,7 +1,5 @@
-import { useWordle } from "contexts/WordleContext";
-import * as S from "styles/components/keyboard/KeyboardRowStyle";
-import Key from "./Key";
-import SpecialKey, { Type } from "./SpecialKey";
+import styles from 'styles/components/keyboard/KeyboardRow.module.scss';
+import KeyboardKey from './KeyboardKey';
 
 interface KeyboardRowProps {
   keys: string[];
@@ -9,27 +7,14 @@ interface KeyboardRowProps {
 }
 
 const KeyboardRow = ({ keys, row }: KeyboardRowProps) => {
-  const { onDeleteClick, onEnterClick } = useWordle();
-
   return (
-    <S.Container>
+    <div className={styles.keyboardRowContainer}>
       {keys.map((key, column) => {
-        if (key.length === 1 && key !== "_")
-          return <Key letter={key} key={`key-${row}-${column}`} />;
         return (
-          <SpecialKey
-            key={`key-${row}-${column}`}
-            type={key as Type}
-            isFake={key === "_"}
-            onButtonClick={() => {
-              if (key === "ENTER") return onEnterClick();
-              if (key === "DELETE") return onDeleteClick();
-              return () => {};
-            }}
-          />
+          <KeyboardKey key={`keyboard-${row}-${column}`} actualKey={key} />
         );
       })}
-    </S.Container>
+    </div>
   );
 };
 
