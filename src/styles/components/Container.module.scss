@@ -1,12 +1,13 @@
 .container {
   main {
     padding: 20px;
-    width: 90%;
+    width: 100%;
     margin: 0 auto;
-    min-height: calc(100vh - 60px);
+    height: calc(100% - 60px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
+    position: fixed;
   }
 }

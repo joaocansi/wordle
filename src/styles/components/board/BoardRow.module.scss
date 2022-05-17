@@ -1,7 +1,8 @@
 .boardRowContainer {
-  display: flex;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 5px;
-  flex: 1;
 
   &.boardRowSelected div {
     background-color: transparent;

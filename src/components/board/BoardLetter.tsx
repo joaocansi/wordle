@@ -1,45 +1,42 @@
+import { useWordle, WordlePosition } from 'contexts/WordleContext';
+
 import classNames from 'classnames';
-import { useWordle } from 'contexts/WordleContext';
 import styles from 'styles/components/board/BoardLetter.module.scss';
 
 interface BoardLetterProps {
   letter: string;
-  positions: {
-    row: number;
-    column: number;
-  };
+  positions: WordlePosition;
 }
 
-const BoardLetter = ({
-  letter,
-  positions: { row, column },
-}: BoardLetterProps) => {
-  const { position, boardStatus, status, isAnimating, onBoardLetterClick } =
-    useWordle();
+const BoardLetter = ({ letter, positions }: BoardLetterProps) => {
+  const { commands, states } = useWordle();
+  const { row, column } = positions;
 
   const classes = classNames([
     styles.boardLetterContainer,
     {
-      [styles.boardLetterSelected]:
-        status === 'IN_PROGRESS' &&
-        !isAnimating() &&
-        row === position.row &&
-        column === position.column,
-      [styles.boardLetterAnimate]: isAnimating() && position.row === row,
+      [styles.boardLetterAnimate]:
+        states.isAnimating() && states.position.row === row,
       [styles.boardLetterCorrect]:
-        boardStatus[row] && boardStatus[row][column] === 'CORRECT',
+        states.boardStatus[row] &&
+        states.boardStatus[row][column] === 'CORRECT',
       [styles.boardLetterPresent]:
-        boardStatus[row] && boardStatus[row][column] === 'PRESENT',
+        states.boardStatus[row] &&
+        states.boardStatus[row][column] === 'PRESENT',
       [styles.boardLetterAbsent]:
-        boardStatus[row] && boardStatus[row][column] === 'ABSENT',
+        states.boardStatus[row] && states.boardStatus[row][column] === 'ABSENT',
+      [styles.boardLetterSelected]:
+        states.isInProgress() &&
+        states.isEqualPosition({ row, column }) &&
+        !states.isAnimating(),
     },
   ]);
 
   return (
     <div
-      onClick={() => onBoardLetterClick(row, column)}
       className={classes}
       style={{ animationDelay: `${0.35 * column}s` }}
+      onClick={() => commands.onBoardLetterClick({ row, column })}
     >
       {letter}
     </div>

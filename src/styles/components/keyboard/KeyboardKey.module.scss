@@ -2,12 +2,12 @@
   flex: 1;
   border: 3px solid var(--color-keyboard-border);
   background-color: var(--color-keyboard-background);
-  height: 65px;
   border-radius: 5px;
   color: var(--color-texts);
-  font-size: 1.75em;
+  font-size: min(3vmin, 1.75em);
   font-weight: 700;
   cursor: pointer;
+  min-height: 60px;
 
   &.keyboardKeyFake {
     background: transparent;
@@ -17,5 +17,6 @@
 
   &.keyboardSpecialKey {
     flex: 1.5;
+    font-size: min(2.5vmin, 1.75em);
   }
 }

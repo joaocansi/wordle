@@ -9,13 +9,15 @@ interface BoardRowProps {
 }
 
 const BoardRow = ({ letters, row }: BoardRowProps) => {
-  const { position, isAnimating, status } = useWordle();
+  const { states } = useWordle();
 
   const classes = classNames([
     styles.boardRowContainer,
     {
       [styles.boardRowSelected]:
-        status === 'IN_PROGRESS' && position.row === row && !isAnimating(),
+        !states.isAnimating() &&
+        states.isInProgress() &&
+        states.position.row === row,
     },
   ]);
 

@@ -7,12 +7,13 @@ export const KEYBOARD = [
 export const GAME_ROWS = 6;
 export const GAME_COLUMNS = 5;
 
-export const NEW_BOARD = Array.from(
-  {
-    length: GAME_ROWS,
-  },
-  () => new Array(GAME_COLUMNS).fill('')
-);
+export const NEW_BOARD = () =>
+  Array.from(
+    {
+      length: GAME_ROWS,
+    },
+    () => new Array(GAME_COLUMNS).fill('')
+  );
 
 export const DEFAULT_THEME = 'yellow';
 export const ALLOWED_LETTERS =

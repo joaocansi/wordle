@@ -4,15 +4,21 @@ import { GAME_COLUMNS, GAME_ROWS } from 'utils/settings';
 const GlobalStyle = createGlobalStyle`
   :root {
     --color-texts: ${(props) => props.theme.colors.texts};
-
     --color-background: ${(props) => props.theme.colors.background};
-   
-    --color-board-background: ${(props) => props.theme.colors.board.background};
-    --color-keyboard-background: ${(props) =>
-      props.theme.colors.keyboard.background};;
 
-    --color-board-border: ${(props) => props.theme.colors.board.border};;
+    --color-board-border: ${(props) => props.theme.colors.board.border};
+    --color-board-background: ${(props) => props.theme.colors.board.background};
+
     --color-keyboard-border: ${(props) => props.theme.colors.keyboard.border};
+    --color-keyboard-background: ${(props) =>
+      props.theme.colors.keyboard.background};
+
+    --color-modal-background: ${(props) => props.theme.colors.modal.background};
+    --color-modal-state-won: ${(props) => props.theme.colors.modal.states.win};
+    --color-modal-state-lost: ${(props) =>
+      props.theme.colors.modal.states.lost};
+    --color-modal-state-neutral: ${(props) =>
+      props.theme.colors.modal.states.neutral};
 
     --color-state-correct: ${(props) => props.theme.colors.states.correct};
     --color-state-absent: ${(props) => props.theme.colors.states.absent};
@@ -20,6 +26,9 @@ const GlobalStyle = createGlobalStyle`
 
     --board-width: ${() => `${GAME_COLUMNS * 80 + (GAME_COLUMNS - 1) * 5}px`};
     --board-height: ${() => `${GAME_ROWS * 80 + (GAME_ROWS - 1) * 5}px`};
+
+    --board-letter-height: 80px;
+    --keyboard-letter-height: 60px;
   } 
 
   * {
@@ -36,14 +45,40 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-family: Helvetica, Arial, sans-serif;
     background-color: var(--color-background);
+    /* overflow: auto !important; */
   }
 
-  @media (max-width: 600px) {
+  /* @media (max-width: 600px) {
     :root {
       --board-width: ${() => `${GAME_COLUMNS * 70 + (GAME_COLUMNS - 1) * 5}px`};
       --board-height: ${() => `${GAME_ROWS * 70 + (GAME_ROWS - 1) * 5}px`};
+      --board-letter-height: 70px;
     }
   }
+
+  @media (max-width: 460px) {
+    :root {
+      --board-width: ${() => `${GAME_COLUMNS * 60 + (GAME_COLUMNS - 1) * 5}px`};
+      --board-height: ${() => `${GAME_ROWS * 60 + (GAME_ROWS - 1) * 5}px`};
+      --board-letter-height: 65px;
+    }
+  }
+  
+  @media (max-width: 400px) {
+    :root {
+      --board-width: ${() => `${GAME_COLUMNS * 50 + (GAME_COLUMNS - 1) * 5}px`};
+      --board-height: ${() => `${GAME_ROWS * 50 + (GAME_ROWS - 1) * 5}px`};
+      --board-letter-height: 50px;
+    }
+  }
+
+  @media (max-width: 300px) {
+    :root {
+      --board-width: ${() => `${GAME_COLUMNS * 40 + (GAME_COLUMNS - 1) * 5}px`};
+      --board-height: ${() => `${GAME_ROWS * 40 + (GAME_ROWS - 1) * 5}px`};
+      --board-letter-height: 40px;
+    }
+  } */
 
   @keyframes correct-animation {
     0% {

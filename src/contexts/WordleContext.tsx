@@ -1,34 +1,60 @@
 import { useSyncState } from 'hooks/useSyncState';
 import {
   createContext,
+  Dispatch,
   ReactNode,
-  useCallback,
+  SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from 'react';
-import { getBoardStatus, getIndexes } from 'utils/functions';
+import { getBoardStatus } from 'utils/functions';
 import { GAME_COLUMNS, GAME_ROWS, NEW_BOARD } from 'utils/settings';
 import { validGuesses, words } from 'utils/words';
 
-interface WordleContextProps {
-  isAnimating: () => boolean;
-  solution: string;
-  status: string;
-  boardStatus: string[][];
-  board: string[][];
-  position: {
-    row: number;
-    column: number;
-  };
-
-  onDeleteClick: () => void;
-  onEnterClick: () => void;
-  onLetterClick: (letter: string) => void;
-  onBoardLetterClick: (row: number, column: number) => void;
-  onKeyboardArrowClick: (direction: string) => void;
+export interface WordlePosition {
+  row: number;
+  column: number;
 }
+
+interface WordleContextProps {
+  states: {
+    modal: boolean;
+    solution: string;
+    board: string[][];
+    boardStatus: any[];
+    status: string;
+    position: WordlePosition;
+    statistics: WordleStatistics;
+    isAnimating: () => boolean;
+    isInProgress: () => boolean;
+    isEqualPosition: (position: WordlePosition) => boolean;
+  };
+  controllers: {
+    setModal: Dispatch<SetStateAction<boolean>>;
+    setSolution: Dispatch<SetStateAction<string>>;
+    setBoard: Dispatch<SetStateAction<string[][]>>;
+    setBoardStatus: Dispatch<SetStateAction<any[]>>;
+    setPosition: Dispatch<SetStateAction<WordlePosition>>;
+  };
+  commands: {
+    onResetGameRequest: () => void;
+    onDeleteClick: () => void;
+    onEnterClick: () => void;
+    onLetterClick: (letter: string) => void;
+    onArrowKeyClick: (direction: string) => void;
+    onBoardLetterClick: (position: WordlePosition) => void;
+  };
+}
+
 interface WordleProviderProps {
   children: ReactNode;
+}
+
+export interface WordleStatistics {
+  guessDistribution: number[];
+  currentStreak: number;
+  maxStreak: number;
 }
 
 const WordleContext = createContext({} as WordleContextProps);
@@ -37,41 +63,52 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
   const [isAnimating, setIsAnimating] = useSyncState(false);
   const [status, setStatus] = useState('IN_PROGRESS');
 
-  const [board, setBoard] = useState(NEW_BOARD);
+  const [board, setBoard] = useState(NEW_BOARD());
   const [boardStatus, setBoardStatus] = useState(Array(GAME_ROWS).fill(null));
 
   const [position, setPosition] = useState({ row: 0, column: 0 });
-  const [solution, setSolution] = useState('AAEEA');
+  const [solution, setSolution] = useState('NAMES');
+  const [modal, setModal] = useState(false);
 
-  // const onLetterClick = useCallback(
-  //   (letter: string) => {
-  //     const isBlocked = isAnimating || position.column >= GAME_COLUMNS;
-  //     if (isBlocked) return;
+  const [statistics, setStatistics] = useState<WordleStatistics>(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('@wordle:statistics'));
+    }
+    return {
+      guessDistribution: Array(GAME_ROWS).fill(0),
+      currentStreak: 0,
+      maxStreak: 0,
+    };
+  });
 
-  //     let newBoard = board;
-  //     newBoard[position.row][position.column] = letter;
+  useEffect(() => {
+    const statistic = localStorage.getItem('@wordle:statistics');
 
-  //     setBoard(newBoard);
-  //     setPosition((previousPosition) => {
-  //       let newPosition = {
-  //         row: previousPosition.row,
-  //         column:
-  //           previousPosition.column >= GAME_COLUMNS
-  //             ? GAME_COLUMNS
-  //             : previousPosition.column + 1,
-  //       };
+    if (!statistic)
+      setStatistics({
+        guessDistribution: Array(GAME_ROWS).fill(0),
+        currentStreak: 0,
+        maxStreak: 0,
+      });
+  }, []);
 
-  //       return newPosition;
-  //     });
-  //   },
-  //   [board, position]
-  // );
+  useEffect(() => {
+    localStorage.setItem('@wordle:statistics', JSON.stringify(statistics));
+  }, [statistics]);
+
+  const onResetGameRequest = () => {
+    setStatus('IN_PROGRESS');
+    setIsAnimating(false);
+    setBoard(NEW_BOARD());
+    setBoardStatus(Array(GAME_ROWS).fill(null));
+    setPosition({ row: 0, column: 0 });
+    setModal(false);
+    setSolution('NAMES');
+  };
 
   const onLetterClick = (letter: string) => {
     const isBlocked =
-      isAnimating() ||
-      status !== 'IN_PROGRESS' ||
-      position.column >= GAME_COLUMNS;
+      isAnimating() || !isInProgress() || position.column >= GAME_COLUMNS;
     if (isBlocked) return;
 
     let newBoard = board;
@@ -81,18 +118,15 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
     setPosition(({ row }) => {
       let nextColumn = board[row].findIndex((item) => item === '');
 
-      let newPosition = {
+      return {
         row,
         column: nextColumn == -1 ? GAME_COLUMNS : nextColumn,
       };
-
-      return newPosition;
     });
   };
 
   const onEnterClick = () => {
-    if (isAnimating() || status !== 'IN_PROGRESS' || position.row === GAME_ROWS)
-      return;
+    if (isAnimating() || !isInProgress() || position.row === GAME_ROWS) return;
 
     if (board[position.row].includes('')) {
       return alert('Not enough letters');
@@ -103,10 +137,7 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
       return alert('Not in word list');
     }
 
-    const solutionArray = Array.from(solution);
-
     let newBoardStatus = boardStatus;
-
     newBoardStatus[position.row] = getBoardStatus(
       board[position.row],
       solution
@@ -127,14 +158,20 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
       setIsAnimating(false);
       setPosition(newPosition);
 
-      if (word === solution) return setStatus('WON');
+      if (word === solution) {
+        setStatus('WON');
+        return setModal(true);
+      }
 
-      if (newPosition.row === GAME_ROWS) return setStatus('GAME_OVER');
+      if (newPosition.row === GAME_ROWS) {
+        setStatus('LOST');
+        return setModal(true);
+      }
     }, GAME_COLUMNS * 350);
   };
 
   const onDeleteClick = () => {
-    if (isAnimating() || status != 'IN_PROGRESS') return;
+    if (isAnimating() || !isInProgress()) return;
 
     let newBoard = board;
     let actualColumn =
@@ -166,55 +203,63 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
     });
   };
 
-  const onBoardLetterClick = (row: number, column: number) => {
-    if (isAnimating() || status !== 'IN_PROGRESS' || position.row !== row)
-      return;
+  const onBoardLetterClick = ({ row, column }: WordlePosition) => {
+    if (isAnimating() || !isInProgress() || position.row !== row) return;
 
     setPosition(({ row }) => {
       return { row, column };
     });
   };
 
-  const onKeyboardArrowClick = (direction: string) => {
-    if (isAnimating() || status !== 'IN_PROGRESS') return;
+  const onArrowKeyClick = (direction: string) => {
+    if (isAnimating() || !isInProgress()) return;
 
-    switch (direction) {
-      case 'left':
-        setPosition(({ row, column }) => {
-          return {
-            row,
-            column: column - 1 < 0 ? 0 : column - 1,
-          };
-        });
+    setPosition(({ row, column }) => {
+      let newLeftPosition = column - 1 < 0 ? 0 : column - 1;
+      let newRightPosition =
+        column + 1 > GAME_COLUMNS - 1 ? column : column + 1;
 
-        break;
-      case 'right':
-        setPosition(({ row, column }) => {
-          return {
-            row,
-            column: column + 1 > GAME_COLUMNS - 1 ? column : column + 1,
-          };
-        });
-
-        break;
-      default:
-    }
+      return {
+        row,
+        column: direction === 'left' ? newLeftPosition : newRightPosition,
+      };
+    });
   };
+
+  const isInProgress = () => status === 'IN_PROGRESS';
+  const isEqualPosition = ({ row, column }: WordlePosition) =>
+    row === position.row && column === position.column;
 
   return (
     <WordleContext.Provider
       value={{
-        isAnimating,
-        solution,
-        status,
-        board,
-        boardStatus,
-        position,
-        onDeleteClick,
-        onEnterClick,
-        onLetterClick,
-        onBoardLetterClick,
-        onKeyboardArrowClick,
+        states: {
+          modal,
+          solution,
+          board,
+          boardStatus,
+          position,
+          status,
+          statistics,
+          isAnimating,
+          isInProgress,
+          isEqualPosition,
+        },
+        controllers: {
+          setModal,
+          setBoard,
+          setBoardStatus,
+          setPosition,
+          setSolution,
+        },
+        commands: {
+          onResetGameRequest,
+          onDeleteClick,
+          onEnterClick,
+          onLetterClick,
+          onArrowKeyClick,
+          onBoardLetterClick,
+        },
       }}
     >
       {children}

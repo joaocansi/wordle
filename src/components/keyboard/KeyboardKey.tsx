@@ -1,18 +1,18 @@
-import classNames from 'classnames';
 import { useWordle } from 'contexts/WordleContext';
+
+import classNames from 'classnames';
 import styles from 'styles/components/keyboard/KeyboardKey.module.scss';
-import { ALLOWED_LETTERS } from 'utils/settings';
 
 interface KeyboardKeyProps {
   actualKey: string;
 }
 
 const KeyboardKey = ({ actualKey }: KeyboardKeyProps) => {
-  const { onLetterClick, onEnterClick, onDeleteClick } = useWordle();
+  const { commands } = useWordle();
 
   const specialKeys = {
-    DELETE: onDeleteClick,
-    ENTER: onEnterClick,
+    DELETE: commands.onDeleteClick,
+    ENTER: commands.onEnterClick,
   };
 
   const classes = classNames([
@@ -29,7 +29,7 @@ const KeyboardKey = ({ actualKey }: KeyboardKeyProps) => {
         if (actualKey === '') return;
         if (specialKeys[actualKey]) return specialKeys[actualKey]();
 
-        onLetterClick(actualKey);
+        commands.onLetterClick(actualKey);
       }}
       className={classes}
     >
