@@ -39,7 +39,7 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html>
+      <Html className="theme-default">
         <Head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
@@ -57,6 +57,10 @@ export default class MyDocument extends Document {
             integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+            rel="stylesheet"
           />
         </Head>
         <body>

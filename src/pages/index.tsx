@@ -9,14 +9,10 @@ import { ALLOWED_LETTERS, DEFAULT_THEME } from 'utils/settings';
 import themes from 'styles/themes';
 import Board from 'components/board/Board';
 import Keyboard from 'components/keyboard/Keyboard';
-import dynamic from 'next/dynamic';
-
-const GameModal = dynamic(() => import('components/modals/GameModal'), {
-  ssr: false,
-});
+import { GameModal } from 'components/modals/status/GameModal';
 
 export default function Home() {
-  const [theme, setTheme] = useState(DEFAULT_THEME);
+  const [theme, setTheme] = useState('dark');
   const { commands, states } = useWordle();
 
   useEffect(() => {
@@ -43,8 +39,9 @@ export default function Home() {
         <Container title="Wordle - Created by @joaocansi">
           <Board />
           <Keyboard />
+
+          <GameModal />
         </Container>
-        <GameModal />
 
         <GlobalStyle />
       </ThemeProvider>

@@ -1,43 +1,23 @@
 .modalOverlay {
   width: 100%;
-  height: 100%;
+  height: 100vh;
 
-  background-color: rgba(0, 0, 0, .4);
-
-  animation-timing-function: linear;
-  animation-fill-mode: backwards;
-  animation-duration: .1s;
-
-  z-index: 10000;
-  
   position: absolute;
-  top: 0;
-  left: 0;
+  bottom: 0;
 
   display: none;
-  padding: 2em 0;
 
-  &.modalOverlayActive {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &.modalVisible {
+    display: initial;
   }
 
-  div.modalContent {
+  .modalContent {
     width: 90%;
-    max-width: 600px;
-    background-color: white;
-    
-    animation-duration: .1s;
-    animation-timing-function: linear;
-    
-    &.modalContentActive {
-      animation-name: modal-content-active-animation;
-    }
-  }
-
-  @keyframes modal-content-active-animation {
-    0% { transform: scale(.9); }
-    100% { transform: scale(1); }
+    margin: 2rem auto;
+    position: absolute;
+    background-color: var(--color-background);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }

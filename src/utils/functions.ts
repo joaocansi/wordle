@@ -22,8 +22,6 @@ export const getBoardStatus = (boardRow: string[], solution: string) => {
   let newBoardStatusRow = [];
   let solutionArray = Array.from(solution);
 
-  console.log(solution);
-
   for (var i = 0; i < boardRow.length; i++) {
     if (boardRow[i] === solution[i]) {
       newBoardStatusRow[i] = 'CORRECT';

@@ -1,20 +1,21 @@
 .boardLetterContainer {
   flex: 1;
   background-color: var(--color-board-background);
-  border: 4px solid var(--color-board-border);
+  border: 6px solid var(--color-board-border);
   border-radius: 10px;
   cursor: pointer;
   font-size: min(4.8em, 10vmin);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-texts);
   transition: border-bottom .05s;
   aspect-ratio: 1;
+  line-height: 100%;
 
   &.boardLetterSelected {
-    border-bottom: 10px solid var(--color-board-border);
+    border-bottom: 12.5px solid var(--color-board-border);
   }
 
   @media (max-width: 400px) {
@@ -43,12 +44,12 @@
   &.boardLetterAbsent {
     background-color: var(--color-state-absent);
     border-color: var(--color-state-absent);
-    animation-name: 'correct-animation';
+    animation-name: 'absent-animation';
   }
 
   &.boardLetterPresent {
     background-color: var(--color-state-present);
     border-color: var(--color-state-present);
-    animation-name: 'correct-animation';
+    animation-name: 'present-animation';
   }
 }

@@ -25,7 +25,6 @@ interface WordleContextProps {
     boardStatus: any[];
     status: string;
     position: WordlePosition;
-    statistics: WordleStatistics;
     isAnimating: () => boolean;
     isInProgress: () => boolean;
     isEqualPosition: (position: WordlePosition) => boolean;
@@ -51,50 +50,18 @@ interface WordleProviderProps {
   children: ReactNode;
 }
 
-export interface WordleStatistics {
-  guessDistribution: number[];
-  currentStreak: number;
-  maxStreak: number;
-}
-
 const WordleContext = createContext({} as WordleContextProps);
 
 export const WordleProvider = ({ children }: WordleProviderProps) => {
   const [isAnimating, setIsAnimating] = useSyncState(false);
-  const [status, setStatus] = useState('IN_PROGRESS');
+  const [status, setStatus] = useState('LOST');
 
   const [board, setBoard] = useState(NEW_BOARD());
   const [boardStatus, setBoardStatus] = useState(Array(GAME_ROWS).fill(null));
 
   const [position, setPosition] = useState({ row: 0, column: 0 });
   const [solution, setSolution] = useState('NAMES');
-  const [modal, setModal] = useState(false);
-
-  const [statistics, setStatistics] = useState<WordleStatistics>(() => {
-    if (typeof window !== 'undefined') {
-      return JSON.parse(localStorage.getItem('@wordle:statistics'));
-    }
-    return {
-      guessDistribution: Array(GAME_ROWS).fill(0),
-      currentStreak: 0,
-      maxStreak: 0,
-    };
-  });
-
-  useEffect(() => {
-    const statistic = localStorage.getItem('@wordle:statistics');
-
-    if (!statistic)
-      setStatistics({
-        guessDistribution: Array(GAME_ROWS).fill(0),
-        currentStreak: 0,
-        maxStreak: 0,
-      });
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('@wordle:statistics', JSON.stringify(statistics));
-  }, [statistics]);
+  const [modal, setModal] = useState(true);
 
   const onResetGameRequest = () => {
     setStatus('IN_PROGRESS');
@@ -240,7 +207,6 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
           boardStatus,
           position,
           status,
-          statistics,
           isAnimating,
           isInProgress,
           isEqualPosition,
