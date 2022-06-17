@@ -38,6 +38,7 @@ const GlobalStyle = createGlobalStyle`
   html,
   textarea {
     font-size: min(10px, 1.75vw);
+    -webkit-text-size-adjust: 100%;
   }
 
   body {

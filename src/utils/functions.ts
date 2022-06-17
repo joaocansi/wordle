@@ -58,3 +58,7 @@ export const getBoardStatus = (boardRow: string[], solution: string) => {
 
   return newBoardStatusRow;
 };
+
+export const getTimeFormatted = (date: Date) => {
+  return `${date.getMinutes()}min ${date.getSeconds()}seg`;
+};

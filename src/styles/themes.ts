@@ -75,7 +75,7 @@ const dark = {
       border: '#4C4347',
     },
     gameModal: {
-      overlayBackground: 'rgba(0, 0, 0, .5)',
+      overlayBackground: 'rgba(0, 0, 0, .6)',
       contentBackground: '#615458',
       button: '#4C4347',
     },

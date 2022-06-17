@@ -9,7 +9,14 @@ import { ALLOWED_LETTERS, DEFAULT_THEME } from 'utils/settings';
 import themes from 'styles/themes';
 import Board from 'components/board/Board';
 import Keyboard from 'components/keyboard/Keyboard';
-import { GameModal } from 'components/modals/status/GameModal';
+import dynamic from 'next/dynamic';
+
+const GameModal = dynamic(
+  () => import('../components/modals/status/GameModal'),
+  {
+    ssr: false,
+  }
+);
 
 export default function Home() {
   const [theme, setTheme] = useState('dark');

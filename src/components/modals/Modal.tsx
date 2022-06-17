@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import styles from 'styles/components/modals/Modal.module.scss';
 
-interface ModalProps {
+export interface ModalProps {
   contentStyle: {
     width: string;
     background: string;
@@ -11,8 +11,8 @@ interface ModalProps {
     background: string;
   };
 
-  isOpen: boolean;
-  children: ReactNode;
+  isOpen?: boolean;
+  children?: ReactNode;
 }
 
 const Modal = ({

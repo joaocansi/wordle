@@ -34,7 +34,7 @@
 
   .gameModalTitle {
     display: flex;
-    gap: 10px;
+    gap: 7.5px;
     margin-bottom: .5rem;
 
     > div {
@@ -108,13 +108,13 @@
 
   &.gameModalWon {
     .gameModalTitle div {
-      background-color: var(--color-state-correct);
+      background-color: var(--color-state-absent);
     }
   }
 
   &.gameModalLost {
     .gameModalTitle div {
-      background-color: var(--color-state-incorrect);
+      background-color: var(--color-state-absent);
     }
   }
 }

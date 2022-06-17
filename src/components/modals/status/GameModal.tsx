@@ -1,25 +1,27 @@
 import classNames from 'classnames';
 import { useWordle } from 'contexts/WordleContext';
-import { useState } from 'react';
 
 import styles from 'styles/components/modals/status/GameModal.module.scss';
+import { getTimeFormatted } from 'utils/functions';
 import Modal from '../Modal';
 
-export const GameModal = () => {
-  const { states } = useWordle();
-  const [state, setState] = useState(states.status !== 'IN_PROGRESS');
+const GameModal = () => {
+  const {
+    states: { status, stats },
+    commands: { getGameTime, getGameAttempts, onResetGameRequest },
+  } = useWordle();
 
   const gameModalClassnames = classNames([
     styles.gameModalContent,
     {
-      [styles.gameModalWon]: states.status === 'WON',
-      [styles.gameModalLost]: states.status === 'LOST',
+      [styles.gameModalWon]: status === 'WON',
+      [styles.gameModalLost]: status === 'LOST',
     },
   ]);
 
   return (
     <Modal
-      isOpen={state}
+      isOpen={status !== 'IN_PROGRESS'}
       contentStyle={{
         background: 'var(--color-game-modal-content-background)',
         width: '500px',
@@ -31,9 +33,20 @@ export const GameModal = () => {
     >
       <div className={gameModalClassnames}>
         <div className={styles.gameModalTitle}>
-          <div>W</div>
-          <div>I</div>
-          <div>N</div>
+          {status === 'WON' ? (
+            <>
+              <div>W</div>
+              <div>I</div>
+              <div>N</div>
+            </>
+          ) : (
+            <>
+              <div>L</div>
+              <div>O</div>
+              <div>S</div>
+              <div>T</div>
+            </>
+          )}
         </div>
 
         <p>
@@ -44,10 +57,10 @@ export const GameModal = () => {
 
         <div className={styles.gameModalRound}>
           <p>
-            Time: <span>2min</span>
+            Time: <span>{getTimeFormatted(getGameTime())}</span>
           </p>
           <p>
-            Attempts: <span>5 (Let's improve it)</span>
+            Attempts: <span>{getGameAttempts()}</span>
           </p>
         </div>
 
@@ -55,24 +68,26 @@ export const GameModal = () => {
           <h4>Stats</h4>
           <div>
             <div>
-              <span>2</span>
+              <span>{stats.rounds}</span>
               <h6>Rounds</h6>
             </div>
 
             <div>
-              <span>50%</span>
+              <span>{Math.floor(10)}%</span>
               <h6>Win rate</h6>
             </div>
 
             <div>
-              <span>1</span>
+              <span>{stats.wins}</span>
               <h6>Wins</h6>
             </div>
           </div>
         </div>
 
-        <button>Play again</button>
+        <button onClick={onResetGameRequest}>Play again</button>
       </div>
     </Modal>
   );
 };
+
+export default GameModal;

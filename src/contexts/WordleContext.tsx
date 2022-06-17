@@ -10,7 +10,13 @@ import {
 } from 'react';
 import { getBoardStatus } from 'utils/functions';
 import { GAME_COLUMNS, GAME_ROWS, NEW_BOARD } from 'utils/settings';
-import { validGuesses, words } from 'utils/words';
+import { validGuesses } from 'utils/words';
+
+export interface StatsProps {
+  wins: number;
+  losses: number;
+  rounds: number;
+}
 
 export interface WordlePosition {
   row: number;
@@ -25,6 +31,8 @@ interface WordleContextProps {
     boardStatus: any[];
     status: string;
     position: WordlePosition;
+    stats: StatsProps;
+
     isAnimating: () => boolean;
     isInProgress: () => boolean;
     isEqualPosition: (position: WordlePosition) => boolean;
@@ -43,6 +51,9 @@ interface WordleContextProps {
     onLetterClick: (letter: string) => void;
     onArrowKeyClick: (direction: string) => void;
     onBoardLetterClick: (position: WordlePosition) => void;
+
+    getGameTime: () => Date;
+    getGameAttempts: () => number;
   };
 }
 
@@ -54,23 +65,46 @@ const WordleContext = createContext({} as WordleContextProps);
 
 export const WordleProvider = ({ children }: WordleProviderProps) => {
   const [isAnimating, setIsAnimating] = useSyncState(false);
-  const [status, setStatus] = useState('LOST');
+  const [modal, setModal] = useState(true);
+
+  const [status, setStatus] = useState('IN_PROGRESS');
+  const [solution, setSolution] = useState('NAMES');
 
   const [board, setBoard] = useState(NEW_BOARD());
   const [boardStatus, setBoardStatus] = useState(Array(GAME_ROWS).fill(null));
 
   const [position, setPosition] = useState({ row: 0, column: 0 });
-  const [solution, setSolution] = useState('NAMES');
-  const [modal, setModal] = useState(true);
+  const [time, setTime] = useState<Date>(new Date());
+
+  const [stats, setStats] = useState<StatsProps>(() => {
+    if (typeof window === 'undefined') {
+      return {} as StatsProps;
+    }
+
+    const data = (JSON.parse(
+      localStorage.getItem('@wordle:stats')
+    ) as StatsProps) || { losses: 0, rounds: 0, wins: 0 };
+
+    return data;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('@wordle:stats', JSON.stringify(stats));
+  }, [stats]);
 
   const onResetGameRequest = () => {
     setStatus('IN_PROGRESS');
+    setSolution('NAMES');
+
     setIsAnimating(false);
+    setModal(false);
+
+    setTime(new Date());
+
     setBoard(NEW_BOARD());
     setBoardStatus(Array(GAME_ROWS).fill(null));
+
     setPosition({ row: 0, column: 0 });
-    setModal(false);
-    setSolution('NAMES');
   };
 
   const onLetterClick = (letter: string) => {
@@ -95,45 +129,31 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
   const onEnterClick = () => {
     if (isAnimating() || !isInProgress() || position.row === GAME_ROWS) return;
 
-    if (board[position.row].includes('')) {
-      return alert('Not enough letters');
-    }
+    let word = getWordByRow(position.row);
 
-    let word = board[position.row].toString().replaceAll(',', '');
-    if (!validGuesses.includes(word.toLowerCase())) {
-      return alert('Not in word list');
-    }
+    if (!isRowFilled()) return alert('Not enough letters');
+    if (!isValidGuess(word)) return alert('Not in word list');
 
-    let newBoardStatus = boardStatus;
-    newBoardStatus[position.row] = getBoardStatus(
-      board[position.row],
-      solution
-    );
-
-    setBoardStatus(newBoardStatus);
     setIsAnimating(true);
+    setBoardStatus((previousBoardStatus) => {
+      previousBoardStatus[position.row] = getBoardStatus(
+        board[position.row],
+        solution
+      );
+      return previousBoardStatus;
+    });
 
-    let timeout: any;
-    clearTimeout(timeout);
-
-    timeout = setTimeout(() => {
-      const newPosition = {
-        row: position.row + 1,
-        column: 0,
-      };
-
+    setTimeout(() => {
       setIsAnimating(false);
-      setPosition(newPosition);
 
-      if (word === solution) {
-        setStatus('WON');
-        return setModal(true);
-      }
+      let newRow = position.row + 1;
+      setPosition({
+        row: newRow,
+        column: 0,
+      });
 
-      if (newPosition.row === GAME_ROWS) {
-        setStatus('LOST');
-        return setModal(true);
-      }
+      if (isSolution(word)) return onGameFinish(true);
+      if (newRow === GAME_ROWS) return onGameFinish(false);
     }, GAME_COLUMNS * 350);
   };
 
@@ -193,9 +213,39 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
     });
   };
 
+  const onGameFinish = (playerWon: boolean) => {
+    setModal(true);
+
+    if (playerWon) {
+      setStatus('WON');
+      setStats({
+        losses: stats.losses,
+        rounds: stats.rounds + 1,
+        wins: stats.wins + 1,
+      });
+      return;
+    }
+
+    setStatus('LOST');
+    setStats({
+      losses: stats.losses + 1,
+      rounds: stats.rounds + 1,
+      wins: stats.wins,
+    });
+  };
+
+  const isRowFilled = () => !board[position.row].includes('');
   const isInProgress = () => status === 'IN_PROGRESS';
   const isEqualPosition = ({ row, column }: WordlePosition) =>
     row === position.row && column === position.column;
+  const isSolution = (word: string) => word === solution;
+  const isValidGuess = (guess: string) =>
+    validGuesses.includes(guess.toLowerCase());
+
+  const getWordByRow = (row: number) =>
+    board[row].toString().replaceAll(',', '');
+  const getGameTime = () => new Date(Date.now() - time.getTime());
+  const getGameAttempts = () => position.row;
 
   return (
     <WordleContext.Provider
@@ -207,6 +257,7 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
           boardStatus,
           position,
           status,
+          stats,
           isAnimating,
           isInProgress,
           isEqualPosition,
@@ -225,6 +276,8 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
           onLetterClick,
           onArrowKeyClick,
           onBoardLetterClick,
+          getGameTime,
+          getGameAttempts,
         },
       }}
     >
