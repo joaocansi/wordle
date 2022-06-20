@@ -1,0 +1,63 @@
+.settingsModalContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  color: var(--color-texts);
+
+  > h4 {
+    text-transform: uppercase;
+    font-size: 3em;
+    font-weight: 700;
+    text-align: center;
+    line-height: 100%;
+  }
+
+  > form {
+    margin-top: 4em;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+
+    > hr {
+      margin-bottom: 2em;
+      border: 1px solid var(--color-texts);
+    }
+  
+    > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2.5em;
+    }
+
+    label, input, select {
+      font-size: 2.25em;
+      text-transform: uppercase;
+    }
+
+    select {
+      text-transform: capitalize;
+      padding: .4em 1.2em;
+      border-radius: 10px;
+    }
+
+    a {
+      font-size: 1.5em;
+      color: var(--color-texts);
+
+      &:hover {
+        filter: brightness(.95);
+      }
+    }
+  }
+
+  > p {
+    font-size: 2em;
+    font-weight: 300;
+
+    > span {
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+  }
+}

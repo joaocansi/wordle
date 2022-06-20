@@ -1,4 +1,5 @@
 export interface ThemeType {
+  name: string;
   colors: {
     constants: {
       black: string;
@@ -14,10 +15,13 @@ export interface ThemeType {
       background: string;
       border: string;
     };
-    gameModal: {
+    modal: {
       overlayBackground: string;
       contentBackground: string;
       button: string;
+    };
+    toast: {
+      background: string;
     };
     states: {
       correct: string;
@@ -36,6 +40,7 @@ const constants = {
 };
 
 const yellow = {
+  name: 'yellow',
   colors: {
     constants,
     texts: '#fff',
@@ -48,9 +53,13 @@ const yellow = {
       border: '#DBCD90',
       background: '#DBCD90',
     },
-    gameModal: {
-      contentBackground: '',
-      overlayBackground: '',
+    modal: {
+      contentBackground: '#E9DAA6',
+      overlayBackground: 'rgba(0, 0, 0, .6)',
+      button: '#DBCD90',
+    },
+    toast: {
+      background: '#D6C890',
     },
     states: {
       present: '#FEBE6A',
@@ -62,6 +71,7 @@ const yellow = {
 } as ThemeType;
 
 const dark = {
+  name: 'dark',
   colors: {
     constants,
     texts: '#ECECEC',
@@ -74,7 +84,10 @@ const dark = {
       background: '#4C4347',
       border: '#4C4347',
     },
-    gameModal: {
+    toast: {
+      background: '#4C4347',
+    },
+    modal: {
       overlayBackground: 'rgba(0, 0, 0, .6)',
       contentBackground: '#615458',
       button: '#4C4347',

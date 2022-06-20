@@ -18733,9 +18733,4 @@ export const validGuesses = [
   'zymic',
   'tetts',
   'stael',
-  'aaaba',
-  'aaabb',
-  'babab',
-  'eeaaa',
-  'eaeea',
 ];

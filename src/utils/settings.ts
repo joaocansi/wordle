@@ -15,6 +15,6 @@ export const NEW_BOARD = () =>
     () => new Array(GAME_COLUMNS).fill('')
   );
 
-export const DEFAULT_THEME = 'yellow';
+export const DEFAULT_THEME = 'dark';
 export const ALLOWED_LETTERS =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

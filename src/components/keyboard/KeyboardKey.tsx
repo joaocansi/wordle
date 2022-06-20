@@ -25,6 +25,7 @@ const KeyboardKey = ({ actualKey }: KeyboardKeyProps) => {
 
   return (
     <button
+      onMouseDown={(e) => e.preventDefault()}
       onClick={() => {
         if (actualKey === '') return;
         if (specialKeys[actualKey]) return specialKeys[actualKey]();

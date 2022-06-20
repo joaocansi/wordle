@@ -11,6 +11,16 @@
     display: initial;
   }
 
+  .modalCloseBtn {
+    font-size: 2.75em;
+    color: var(--color-texts);
+    position: absolute;
+    right: .5em;
+    top: .9em;
+    line-height: 0;
+    cursor: pointer;
+  }
+
   .modalContent {
     width: 90%;
     margin: 2rem auto;

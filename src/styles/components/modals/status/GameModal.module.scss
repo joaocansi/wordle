@@ -27,7 +27,7 @@
     font-size: 2em;
     text-transform: uppercase;
     padding: 1em 5em;
-    background-color: var(--color-game-modal-button);
+    background-color: var(--color-modal-button);
     border-radius: 10px;
     cursor: pointer;
   }
@@ -99,11 +99,6 @@
     text-align: center;
     font-size: 2.25em;
     color: var(--color-texts);
-    
-    
-    p > span {
-      filter: brightness(.85);
-    }
   }
 
   &.gameModalWon {

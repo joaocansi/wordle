@@ -1,25 +1,13 @@
 import Container from 'components/Container';
-import GlobalStyle from 'styles/globals';
 
-import { ThemeProvider } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useWordle } from 'contexts/WordleContext';
-import { ALLOWED_LETTERS, DEFAULT_THEME } from 'utils/settings';
+import { ALLOWED_LETTERS } from 'utils/settings';
 
-import themes from 'styles/themes';
 import Board from 'components/board/Board';
 import Keyboard from 'components/keyboard/Keyboard';
-import dynamic from 'next/dynamic';
-
-const GameModal = dynamic(
-  () => import('../components/modals/status/GameModal'),
-  {
-    ssr: false,
-  }
-);
 
 export default function Home() {
-  const [theme, setTheme] = useState('dark');
   const { commands, states } = useWordle();
 
   useEffect(() => {
@@ -41,17 +29,9 @@ export default function Home() {
   }, [states.board, states.position]);
 
   return (
-    <>
-      <ThemeProvider theme={themes[theme]}>
-        <Container title="Wordle - Created by @joaocansi">
-          <Board />
-          <Keyboard />
-
-          <GameModal />
-        </Container>
-
-        <GlobalStyle />
-      </ThemeProvider>
-    </>
+    <Container title="Wordle - Created by @joaocansi">
+      <Board />
+      <Keyboard />
+    </Container>
   );
 }

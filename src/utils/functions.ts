@@ -1,4 +1,4 @@
-import { validGuesses } from './words';
+import { validGuesses, words } from './words';
 
 export const ArrayToString = (value: string[]) => {
   return value.toString().replaceAll(',', '');
@@ -17,6 +17,9 @@ export const getIndexes = (value: any, array: any[]) => {
 export const isWord = (word: string) => {
   return validGuesses.includes(word.toLowerCase());
 };
+
+export const generateNewWord = () =>
+  words[Math.floor(Math.random() * words.length)].toUpperCase();
 
 export const getBoardStatus = (boardRow: string[], solution: string) => {
   let newBoardStatusRow = [];

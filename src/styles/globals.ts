@@ -13,12 +13,13 @@ const GlobalStyle = createGlobalStyle`
     --color-keyboard-background: ${(props) =>
       props.theme.colors.keyboard.background};
 
-    --color-game-modal-overlay-background: ${(props) =>
-      props.theme.colors.gameModal.overlayBackground};
-    --color-game-modal-content-background: ${(props) =>
-      props.theme.colors.gameModal.contentBackground};
-    --color-game-modal-button: ${(props) =>
-      props.theme.colors.gameModal.button};
+    --color-toast-background: ${(props) => props.theme.colors.toast.background};
+
+    --color-modal-overlay-background: ${(props) =>
+      props.theme.colors.modal.overlayBackground};
+    --color-modal-content-background: ${(props) =>
+      props.theme.colors.modal.contentBackground};
+    --color-modal-button: ${(props) => props.theme.colors.modal.button};
 
     --color-state-incorrect: ${(props) => props.theme.colors.states.incorrect};
     --color-state-correct: ${(props) => props.theme.colors.states.correct};

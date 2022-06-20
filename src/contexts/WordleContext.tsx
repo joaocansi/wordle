@@ -1,3 +1,4 @@
+import GameModal from 'components/modals/status/GameModal';
 import { useSyncState } from 'hooks/useSyncState';
 import {
   createContext,
@@ -8,9 +9,11 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { getBoardStatus } from 'utils/functions';
+import toast from 'react-hot-toast';
+import { generateNewWord, getBoardStatus } from 'utils/functions';
 import { GAME_COLUMNS, GAME_ROWS, NEW_BOARD } from 'utils/settings';
-import { validGuesses } from 'utils/words';
+import { validGuesses, words } from 'utils/words';
+import { useModal } from './ModalContext';
 
 export interface StatsProps {
   wins: number;
@@ -68,13 +71,15 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
   const [modal, setModal] = useState(true);
 
   const [status, setStatus] = useState('IN_PROGRESS');
-  const [solution, setSolution] = useState('NAMES');
+  const [solution, setSolution] = useState(generateNewWord());
 
   const [board, setBoard] = useState(NEW_BOARD());
   const [boardStatus, setBoardStatus] = useState(Array(GAME_ROWS).fill(null));
 
   const [position, setPosition] = useState({ row: 0, column: 0 });
   const [time, setTime] = useState<Date>(new Date());
+
+  const { displayModal, hideModal } = useModal();
 
   const [stats, setStats] = useState<StatsProps>(() => {
     if (typeof window === 'undefined') {
@@ -94,7 +99,7 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
 
   const onResetGameRequest = () => {
     setStatus('IN_PROGRESS');
-    setSolution('NAMES');
+    setSolution(generateNewWord());
 
     setIsAnimating(false);
     setModal(false);
@@ -105,6 +110,7 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
     setBoardStatus(Array(GAME_ROWS).fill(null));
 
     setPosition({ row: 0, column: 0 });
+    hideModal();
   };
 
   const onLetterClick = (letter: string) => {
@@ -131,8 +137,10 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
 
     let word = getWordByRow(position.row);
 
-    if (!isRowFilled()) return alert('Not enough letters');
-    if (!isValidGuess(word)) return alert('Not in word list');
+    if (!isRowFilled())
+      return toast("Fill the row before trying pressing 'Enter'");
+    if (!isValidGuess(word))
+      return toast('This word is invalid. Try another one!');
 
     setIsAnimating(true);
     setBoardStatus((previousBoardStatus) => {
@@ -215,8 +223,13 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
 
   const onGameFinish = (playerWon: boolean) => {
     setModal(true);
+    displayModal({
+      component: GameModal,
+    });
 
     if (playerWon) {
+      toast(`Congratulation! You guessed the right word.`);
+
       setStatus('WON');
       setStats({
         losses: stats.losses,
@@ -225,6 +238,8 @@ export const WordleProvider = ({ children }: WordleProviderProps) => {
       });
       return;
     }
+
+    toast(`Wrong guess! The word was ${solution}`);
 
     setStatus('LOST');
     setStats({
