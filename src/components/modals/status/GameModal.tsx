@@ -8,7 +8,7 @@ import asModal from '../Modal';
 
 const GameModal = () => {
   const {
-    states: { status, stats },
+    states: { status, stats, solution },
     commands: { getGameTime, getGameAttempts, onResetGameRequest },
   } = useWordle();
 
@@ -40,10 +40,18 @@ const GameModal = () => {
       </div>
 
       <p>
-        Congratulations! <br /> You picked the right word
+        {status === 'WON' ? (
+          <>
+            Congratulations! <br /> You picked the right word
+          </>
+        ) : (
+          <>
+            I'm sorry! <br /> You didn't win the game
+          </>
+        )}
       </p>
 
-      <h3>NAMES</h3>
+      <h3>{solution}</h3>
 
       <div className={styles.gameModalRound}>
         <p>
